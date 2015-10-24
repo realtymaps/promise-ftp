@@ -107,4 +107,4 @@ to an object with the following attributes:
   * _code_: < _integer_ >responseCode.
 
 * **all other methods are virtually identical to those of [node-ftp](https://github.com/mscdex/node-ftp#api), except
-returning results and errors via promise.*
+returning results and errors via promise.**
