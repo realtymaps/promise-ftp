@@ -106,5 +106,5 @@ to an object with the following attributes:
   * _text_: < _string_ > responseText
   * _code_: < _integer_ > responseCode.
 
-* **all other methods are essentially identical to those of [node-ftp](https://github.com/mscdex/node-ftp#api)**; the
+**All other methods are essentially identical to those of [node-ftp](https://github.com/mscdex/node-ftp#api)**; the
 only difference is that promise-ftp returns results and errors via promise instead of callback.
