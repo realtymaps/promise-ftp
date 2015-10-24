@@ -92,7 +92,7 @@ Methods
 
 * **(constructor)**() - Creates and returns a new FTP client instance (not via a promise).
 
-* **connect**(< _object_ >config) - Connects to an FTP server; returned promise resolves to the server's greeting
+* **connect**(< _object_ > config) - Connects to an FTP server; returned promise resolves to the server's greeting
 message. Valid config properties are identical to [node-ftp](https://github.com/mscdex/node-ftp#methods).
 
 * **end**() - Closes the connection to the server after any/all enqueued commands have been executed; returned promise
@@ -101,10 +101,10 @@ resolves to a boolean indicating whether there was an error associated with clos
 * **destroy**() - Closes the connection to the server immediately; returns a boolean rather than a promise, indicating
 whether the client was connected prior to the call to `destroy()`.
 
-* **site**(< _string_ >command) - Sends `command` (e.g. 'CHMOD 755 foo', 'QUOTA') using SITE; returned promise resolves
+* **site**(< _string_ > command) - Sends `command` (e.g. 'CHMOD 755 foo', 'QUOTA') using SITE; returned promise resolves
 to an object with the following attributes:
-  * _text_: < _string >responseText
+  * _text_: < _string_ >responseText
   * _code_: < _integer_ >responseCode.
 
-* **all other methods are virtually identical to those of [node-ftp](https://github.com/mscdex/node-ftp#api), except
-returning results and errors via promise.**
+* **all other methods are essentially identical to those of [node-ftp](https://github.com/mscdex/node-ftp#api)**; the
+only difference is that promise-ftp returns results and errors via promise instead of callback.
