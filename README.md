@@ -103,8 +103,8 @@ whether the client was connected prior to the call to `destroy()`.
 
 * **site**(< _string_ > command) - Sends `command` (e.g. 'CHMOD 755 foo', 'QUOTA') using SITE; returned promise resolves
 to an object with the following attributes:
-  * _text_: < _string_ >responseText
-  * _code_: < _integer_ >responseCode.
+  * _text_: < _string_ > responseText
+  * _code_: < _integer_ > responseCode.
 
 * **all other methods are essentially identical to those of [node-ftp](https://github.com/mscdex/node-ftp#api)**; the
 only difference is that promise-ftp returns results and errors via promise instead of callback.
