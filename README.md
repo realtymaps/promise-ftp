@@ -14,6 +14,11 @@ CoffeeScript.  Promises in this module are provided by [Bluebird](https://github
 Change Log
 ============
 
+* Version 1.2.0 changes:
+  * the `FtpConnectionError` and `FtpReconectError` classes have been moved to
+  [their own module](https://github.com/realtymaps/promise-ftp-errors), in anticipation of creating a
+  semi-interchangeable API for [promise-sftp](https://github.com/realtymaps/promise-sftp).
+
 * Version 1.1.0 adds:
   * the `autoReconnect` and `preserveCwd` options
   * the `FtpReconectError` error class
