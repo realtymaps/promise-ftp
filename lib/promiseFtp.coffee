@@ -63,31 +63,22 @@ class PromiseFtp
       @[name] = do (name) -> (args...) ->
         checkConnection(name)
         .then () ->
-          console.log("----------------------- checkConnection.then")
           promisifiedClientMethods[name](args...)
     
     checkConnection = (methodName) => Promise.try () =>
-      console.log("----------------------- checkConnection")
       if unexpectedClose && autoReconnect && !autoReconnectPromise
-        console.log("----------------------- setting autoReconnectPromise")
         autoReconnectPromise = _connect(connectionStatuses.RECONNECTING)
       if autoReconnectPromise
-        console.log("----------------------- autoReconnectPromise is truthy")
         autoReconnectPromise
         .catch (err) ->
-          console.log("----------------------- autoReconnectPromise.catch")
           throw new FtpReconnectError(closeError, err, false)
         .then () ->
-          console.log("----------------------- autoReconnectPromise.then")
           if preserveCwd
-            console.log("----------------------- preserveCwd")
             promisifiedClientMethods.cwd(intendedCwd)
             .catch (err) =>
-              console.log("----------------------- cwd.catch")
               @destroy()
               throw new FtpReconnectError(closeError, err, true)
       else if connectionStatus != connectionStatuses.CONNECTED
-        console.log("----------------------- else not connected")
         throw new FtpConnectionError("can't perform '#{methodName}' command when connection status is: #{connectionStatus}")
 
     _connect = (tempStatus) -> new Promise (resolve, reject) ->
