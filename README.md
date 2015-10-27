@@ -5,7 +5,7 @@ promise-ftp is an FTP client module for [node.js](http://nodejs.org/) that provi
 communicating with an FTP server.
 
 This module is a wrapper around the [node-ftp](https://github.com/mscdex/node-ftp) module, and provides some additional
-features as well as a promise-based API.
+features as well as a convenient promise-based API.
 
 This library is written primarily in CoffeeScript, but may be used just as easily in a Node app using Javascript or
 CoffeeScript.  Promises in this module are provided by [Bluebird](https://github.com/petkaantonov/bluebird).
@@ -37,6 +37,7 @@ Install
 =======
 
     npm install promise-ftp
+    npm install promise-ftp-errors   # only necessary on npm 3+
 
 
 Examples

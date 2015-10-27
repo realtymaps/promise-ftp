@@ -1,7 +1,7 @@
 {
   "name": "promise-ftp",
-  "description": "a thin promise-based wrapper around a node ftp client",
-  "version": "1.1.0",
+  "description": "a promise-based ftp client for node.js",
+  "version": "1.2.0",
   "main": "index.js",
   "author": "RealtyMaps",
   "contributors": [
@@ -24,6 +24,9 @@
     "bluebird": "2.x",
     "coffee-script": "1.x",
     "ftp": "0.3.10"
+  },
+  "peerDependencies": {
+    "promise-ftp-errors": "1.x"
   },
   "license": "MIT",
   "bugs": {
