@@ -2,6 +2,7 @@
 ### jshint -W097 ###
 'use strict'
 
+
 FtpClient = require 'ftp'
 Promise = require 'bluebird'
 path = require 'path'
@@ -9,6 +10,7 @@ path = require 'path'
 FtpConnectionError = require('promise-ftp-common').FtpConnectionError
 FtpReconnectError = require('promise-ftp-common').FtpReconnectError
 STATUSES = require('promise-ftp-common').STATUSES
+
 
 simplePassthroughMethods = [
   'ascii'
