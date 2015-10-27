@@ -6,8 +6,8 @@ FtpClient = require 'ftp'
 Promise = require 'bluebird'
 path = require 'path'
 
-FtpConnectionError = require './ftpConnectionError'
-FtpReconnectError = require './ftpReconnectError'
+FtpConnectionError = require('promise-ftp-errors').FtpConnectionError
+FtpReconnectError = require('promise-ftp-errors').FtpReconnectError
 connectionStatuses = require './connectionStatuses'
 
 
