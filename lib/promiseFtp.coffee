@@ -6,10 +6,9 @@ FtpClient = require 'ftp'
 Promise = require 'bluebird'
 path = require 'path'
 
-FtpConnectionError = require('promise-ftp-errors').FtpConnectionError
-FtpReconnectError = require('promise-ftp-errors').FtpReconnectError
-connectionStatuses = require './connectionStatuses'
-
+FtpConnectionError = require('promise-ftp-common').FtpConnectionError
+FtpReconnectError = require('promise-ftp-common').FtpReconnectError
+STATUSES = require('promise-ftp-common').STATUSES
 
 simplePassthroughMethods = [
   'ascii'
@@ -36,7 +35,7 @@ simplePassthroughMethods = [
 class PromiseFtp
 
   constructor: () ->
-    connectionStatus = connectionStatuses.NOT_YET_CONNECTED
+    connectionStatus = STATUSES.NOT_YET_CONNECTED
     client = new FtpClient()
     ftpOptions = null
     autoReconnect = null
@@ -53,8 +52,8 @@ class PromiseFtp
     client.on 'close', (hadError) ->
       if hadError
         closeError = lastError
-      unexpectedClose = (connectionStatus != connectionStatuses.DISCONNECTING && connectionStatus != connectionStatuses.LOGGING_OUT)
-      connectionStatus = connectionStatuses.DISCONNECTED
+      unexpectedClose = (connectionStatus != STATUSES.DISCONNECTING && connectionStatus != STATUSES.LOGGING_OUT)
+      connectionStatus = STATUSES.DISCONNECTED
       autoReconnectPromise = null
 
     promisifiedClientMethods = {}
@@ -67,7 +66,7 @@ class PromiseFtp
     
     checkConnection = (methodName) => Promise.try () =>
       if unexpectedClose && autoReconnect && !autoReconnectPromise
-        autoReconnectPromise = _connect(connectionStatuses.RECONNECTING)
+        autoReconnectPromise = _connect(STATUSES.RECONNECTING)
       if autoReconnectPromise
         autoReconnectPromise
         .catch (err) ->
@@ -78,7 +77,7 @@ class PromiseFtp
             .catch (err) =>
               @destroy()
               throw new FtpReconnectError(closeError, err, true)
-      else if connectionStatus != connectionStatuses.CONNECTED
+      else if connectionStatus != STATUSES.CONNECTED
         throw new FtpConnectionError("can't perform '#{methodName}' command when connection status is: #{connectionStatus}")
 
     _connect = (tempStatus) -> new Promise (resolve, reject) ->
@@ -89,7 +88,7 @@ class PromiseFtp
           serverMessage = msg
         onReady = () ->
           client.removeListener('error', onError)
-          connectionStatus = connectionStatuses.CONNECTED
+          connectionStatus = STATUSES.CONNECTED
           closeError = null
           unexpectedClose = false
           resolve(serverMessage)
@@ -101,7 +100,7 @@ class PromiseFtp
         client.connect(ftpOptions)
     
     @connect = (options) ->
-      if connectionStatus != connectionStatuses.NOT_YET_CONNECTED && connectionStatus != connectionStatuses.DISCONNECTED
+      if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
         throw new FtpConnectionError("can't connect when connection status is: '#{connectionStatus}'")
       # copy options object so options can't change without another call to @connect()
       ftpOptions = {}
@@ -118,31 +117,31 @@ class PromiseFtp
       preserveCwd = !!options.preserveCwd
       delete ftpOptions.preserveCwd
       # now that everything is set up, we can connect
-      _connect(connectionStatuses.CONNECTING)
+      _connect(STATUSES.CONNECTING)
   
     @reconnect = () ->
-      if connectionStatus != connectionStatuses.NOT_YET_CONNECTED && connectionStatus != connectionStatuses.DISCONNECTED
+      if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
         throw new FtpConnectionError("can't reconnect when connection status is: '#{connectionStatus}'")
-      _connect(connectionStatuses.RECONNECTING)
+      _connect(STATUSES.RECONNECTING)
 
     @logout = () ->
-      connectionStatus = connectionStatuses.LOGGING_OUT
+      connectionStatus = STATUSES.LOGGING_OUT
       promisifiedClientMethods.logout()
 
     @end = () -> new Promise (resolve, reject) ->
-      if connectionStatus == connectionStatuses.NOT_YET_CONNECTED || connectionStatus == connectionStatuses.DISCONNECTED
+      if connectionStatus == STATUSES.NOT_YET_CONNECTED || connectionStatus == STATUSES.DISCONNECTED
         reject(new FtpConnectionError("can't end connection when connection status is: #{connectionStatus}"))
-      connectionStatus = connectionStatuses.DISCONNECTING
+      connectionStatus = STATUSES.DISCONNECTING
       client.once 'close', (hadError) ->
         resolve(if hadError then lastError||true else false)
       client.end()
   
     @destroy = () ->
-      if connectionStatus == connectionStatuses.NOT_YET_CONNECTED || connectionStatus == connectionStatuses.DISCONNECTED
+      if connectionStatus == STATUSES.NOT_YET_CONNECTED || connectionStatus == STATUSES.DISCONNECTED
         wasDisconnected = true
       else
         wasDisconnected = false
-        connectionStatus = connectionStatuses.DISCONNECTING
+        connectionStatus = STATUSES.DISCONNECTING
       client.destroy()
       wasDisconnected
 
