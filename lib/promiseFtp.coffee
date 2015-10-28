@@ -102,10 +102,10 @@ class PromiseFtp
       client.once('error', onError)
       client.connect(connectOptions)
     
-    
+      
     # methods listed in otherPrototypeMethods, which don't get a wrapper
     
-    @connect = (options) ->
+    @connect = (options) -> Promise.try () ->
       if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
         throw new FtpConnectionError("can't connect when connection status is: '#{connectionStatus}'")
       # copy options object so options can't change without another call to @connect()
@@ -125,18 +125,23 @@ class PromiseFtp
       # now that everything is set up, we can connect
       _connect(STATUSES.CONNECTING)
   
-    @reconnect = () ->
+    @reconnect = () -> Promise.try () ->
       if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
         throw new FtpConnectionError("can't reconnect when connection status is: '#{connectionStatus}'")
       _connect(STATUSES.RECONNECTING)
 
     @logout = () ->
-      connectionStatus = STATUSES.LOGGING_OUT
-      promisifiedClientMethods.logout()
+      wait = if autoReconnectPromise then autoReconnectPromise else Promise.resolve()
+      wait
+      .then () ->
+        if connectionStatus == STATUSES.NOT_YET_CONNECTED || connectionStatus == STATUSES.DISCONNECTED || connectionStatus == STATUSES.DISCONNECTING
+          throw new FtpConnectionError("can't log out when connection status is: #{connectionStatus}")
+        connectionStatus = STATUSES.LOGGING_OUT
+        promisifiedClientMethods.logout()
 
     @end = () -> new Promise (resolve, reject) ->
       if connectionStatus == STATUSES.NOT_YET_CONNECTED || connectionStatus == STATUSES.DISCONNECTED
-        reject(new FtpConnectionError("can't end connection when connection status is: #{connectionStatus}"))
+        return reject(new FtpConnectionError("can't end connection when connection status is: #{connectionStatus}"))
       connectionStatus = STATUSES.DISCONNECTING
       client.once 'close', (hadError) ->
         resolve(if hadError then lastError||true else false)
