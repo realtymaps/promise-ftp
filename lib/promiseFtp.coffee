@@ -12,7 +12,9 @@ FtpReconnectError = require('promise-ftp-common').FtpReconnectError
 STATUSES = require('promise-ftp-common').STATUSES
 
 
-simplePassthroughMethods = [
+# these methods need no custom logic; just wrap the common promise, connection-check, and reconnect logic around the
+# originals and pass through any args
+simpleReconnectPassthroughs = [
   'ascii'
   'binary'
   'abort'
@@ -33,6 +35,24 @@ simplePassthroughMethods = [
   'restart'
 ]
 
+# these methods will have custom logic defined, and then will be wrapped in common promise, connection-check, and
+# reconnect logic
+complexReconnectPassthroughs = [
+  'site'
+  'cwd'
+  'cdup'
+]
+
+# these methods do not use the common wrapper; they're listed here in order to be properly set on the prototype
+otherPrototypeMethods = [
+  'connect'
+  'reconnect'
+  'logout'
+  'end'
+  'destroy'
+  'getConnectionStatus'
+]
+
 
 class PromiseFtp
 
@@ -48,7 +68,10 @@ class PromiseFtp
     reconnectError = null
     unexpectedClose = null
     autoReconnectPromise = null
+    promisifiedClientMethods = {}
     
+    
+    # always-on event handlers
     client.on 'error', (err) ->
       lastError = err
     client.on 'close', (hadError) ->
@@ -57,49 +80,30 @@ class PromiseFtp
       unexpectedClose = (connectionStatus != STATUSES.DISCONNECTING && connectionStatus != STATUSES.LOGGING_OUT)
       connectionStatus = STATUSES.DISCONNECTED
       autoReconnectPromise = null
-
-    promisifiedClientMethods = {}
-    for name in simplePassthroughMethods
-      promisifiedClientMethods[name] = Promise.promisify(client[name], client)
-      @[name] = do (name) -> (args...) ->
-        checkConnection(name)
-        .then () ->
-          promisifiedClientMethods[name](args...)
+      
     
-    checkConnection = (methodName) => Promise.try () =>
-      if unexpectedClose && autoReconnect && !autoReconnectPromise
-        autoReconnectPromise = _connect(STATUSES.RECONNECTING)
-      if autoReconnectPromise
-        autoReconnectPromise
-        .catch (err) ->
-          throw new FtpReconnectError(closeError, err, false)
-        .then () ->
-          if preserveCwd
-            promisifiedClientMethods.cwd(intendedCwd)
-            .catch (err) =>
-              @destroy()
-              throw new FtpReconnectError(closeError, err, true)
-      else if connectionStatus != STATUSES.CONNECTED
-        throw new FtpConnectionError("can't perform '#{methodName}' command when connection status is: #{connectionStatus}")
-
+    # internal connect logic
     _connect = (tempStatus) -> new Promise (resolve, reject) ->
-        connectionStatus = tempStatus
-        reconnectError = null
-        serverMessage = null
-        client.once 'greeting', (msg) ->
-          serverMessage = msg
-        onReady = () ->
-          client.removeListener('error', onError)
-          connectionStatus = STATUSES.CONNECTED
-          closeError = null
-          unexpectedClose = false
-          resolve(serverMessage)
-        onError = (err) ->
-          client.removeListener('ready', onReady)
-          reject(err)
-        client.once('ready', onReady)
-        client.once('error', onError)
-        client.connect(connectOptions)
+      connectionStatus = tempStatus
+      reconnectError = null
+      serverMessage = null
+      client.once 'greeting', (msg) ->
+        serverMessage = msg
+      onReady = () ->
+        client.removeListener('error', onError)
+        connectionStatus = STATUSES.CONNECTED
+        closeError = null
+        unexpectedClose = false
+        resolve(serverMessage)
+      onError = (err) ->
+        client.removeListener('ready', onReady)
+        reject(err)
+      client.once('ready', onReady)
+      client.once('error', onError)
+      client.connect(connectOptions)
+    
+    
+    # methods listed in otherPrototypeMethods, which don't get a wrapper
     
     @connect = (options) ->
       if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
@@ -150,15 +154,16 @@ class PromiseFtp
     @getConnectionStatus = () ->
       connectionStatus
 
-    reconnectMethodHandlers = {}
     
-    reconnectMethodHandlers.site = (command) ->
+    # methods listed in complexReconnectPassthroughs, which will get a common logic wrapper
+    
+    @site = (command) ->
       promisifiedClientMethods.site(command)
       .spread (text, code) ->
         text: text
         code: code
 
-    reconnectMethodHandlers.cwd = (dir) ->
+    @cwd = (dir) ->
       promisifiedClientMethods.cwd(dir)
       .then (result) ->
         if dir.charAt(0) == '/'
@@ -167,18 +172,53 @@ class PromiseFtp
           intendedCwd = path.join(intendedCwd, dir)
         result
 
-    reconnectMethodHandlers.cdup = () ->
+    @cdup = () ->
       promisifiedClientMethods.cdup()
       .then (result) ->
         intendedCwd = path.join(intendedCwd, '..')
         result
 
-    for name,handler of reconnectMethodHandlers
+    
+    # common promise, connection-check, and reconnect logic
+    commonLogicFactory = (name, handler) ->
       promisifiedClientMethods[name] = Promise.promisify(client[name], client)
-      @[name] = do (name,handler) -> (args...) ->
-        checkConnection(name)
+      if !handler
+        handler = promisifiedClientMethods[name]
+      (args...) ->
+        Promise.try () =>
+          # if we need to reconnect and we're not already reconnecting, start reconnect
+          if unexpectedClose && autoReconnect && !autoReconnectPromise
+            autoReconnectPromise = _connect(STATUSES.RECONNECTING)
+            .catch (err) ->
+              throw new FtpReconnectError(closeError, err, false)
+            .then () ->
+              if preserveCwd
+                promisifiedClientMethods.cwd(intendedCwd)
+                .catch (err) =>
+                  @destroy()
+                  throw new FtpReconnectError(closeError, err, true)
+          # if we just started reconnecting or were already reconnecting, wait for that to finish before continuing
+          if autoReconnectPromise
+            return autoReconnectPromise
+          else if connectionStatus != STATUSES.CONNECTED
+            throw new FtpConnectionError("can't perform '#{methodName}' command when connection status is: #{connectionStatus}")
         .then () ->
+          # now perform the requested command
           handler(args...)
+
+    # create the methods listed in simpleReconnectPassthroughs as common logic wrapped around the original client method
+    for name in simpleReconnectPassthroughs
+      @[name] = commonLogicFactory(name)
+
+    # wrap the methods listed in complexReconnectPassthroughs with common logic
+    for name in complexReconnectPassthroughs
+      @[name] = commonLogicFactory(name, @[name])
+
+  
+  # set method names on the prototype; they'll be overwritten with real functions from inside the constructor's closure
+  for methodList in [simpleReconnectPassthroughs, complexReconnectPassthroughs, otherPrototypeMethods]
+    for methodName in methodList
+      PromiseFtp.prototype[methodName] = null
 
 
 module.exports = PromiseFtp
