@@ -160,10 +160,10 @@ message. Valid config properties:
     
     * autoReconnect <_boolean_>: Whether to attempt to automatically reconnect using the existing config if the
     connection is unexpectedly closed.  Auto-reconnection is lazy, and so will wait until a command needs to be issued
-    before attempting to reconnect.
+    before attempting to reconnect.  **Default:** false
     
     * preserveCwd <_boolean_>: Whether to attempt to return to the prior current working directory after a successful
-    automatic reconnection.  Only valid if `autoReconnect` is true.
+    automatic reconnection.  Only used if `autoReconnect` is true.  **Default:** false
     
 * **reconnect**(): Connects to an FTP server using the config from the most recent call to **connect()**.
 

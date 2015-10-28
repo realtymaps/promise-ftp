@@ -3,9 +3,9 @@
 'use strict'
 
 
-FtpClient = require 'ftp'
-Promise = require 'bluebird'
-path = require 'path'
+FtpClient = require('ftp')
+Promise = require('bluebird')
+path = require('path')
 
 FtpConnectionError = require('promise-ftp-common').FtpConnectionError
 FtpReconnectError = require('promise-ftp-common').FtpReconnectError
@@ -39,7 +39,7 @@ class PromiseFtp
   constructor: () ->
     connectionStatus = STATUSES.NOT_YET_CONNECTED
     client = new FtpClient()
-    ftpOptions = null
+    connectOptions = null
     autoReconnect = null
     preserveCwd = null
     intendedCwd = '.'
@@ -99,25 +99,25 @@ class PromiseFtp
           reject(err)
         client.once('ready', onReady)
         client.once('error', onError)
-        client.connect(ftpOptions)
+        client.connect(connectOptions)
     
     @connect = (options) ->
       if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
         throw new FtpConnectionError("can't connect when connection status is: '#{connectionStatus}'")
       # copy options object so options can't change without another call to @connect()
-      ftpOptions = {}
+      connectOptions = {}
       for key,value of options
-        ftpOptions[key] = value
+        connectOptions[key] = value
       # deep copy options.secureOptions... or at least mostly, ignoring the possibility of mutable secureOptions fields
       if options.secureOptions
-        ftpOptions.secureOptions = {}
+        connectOptions.secureOptions = {}
         for key,value of options.secureOptions
-          ftpOptions.secureOptions[key] = value
+          connectOptions.secureOptions[key] = value
       # the following options are part of PromiseFtp, so they're not understood by the underlying client
       autoReconnect = !!options.autoReconnect
-      delete ftpOptions.autoReconnect
+      delete connectOptions.autoReconnect
       preserveCwd = !!options.preserveCwd
-      delete ftpOptions.preserveCwd
+      delete connectOptions.preserveCwd
       # now that everything is set up, we can connect
       _connect(STATUSES.CONNECTING)
   
