@@ -68,7 +68,6 @@ class PromiseFtp
     intendedCwd = '.'
     lastError = null
     closeError = null
-    reconnectError = null
     unexpectedClose = null
     autoReconnectPromise = null
     promisifiedClientMethods = {}
@@ -88,7 +87,6 @@ class PromiseFtp
     # internal connect logic
     _connect = (tempStatus) -> new Promise (resolve, reject) ->
       connectionStatus = tempStatus
-      reconnectError = null
       serverMessage = null
       client.once 'greeting', (msg) ->
         serverMessage = msg
@@ -209,7 +207,7 @@ class PromiseFtp
           if autoReconnectPromise
             return autoReconnectPromise
           else if connectionStatus != STATUSES.CONNECTED
-            throw new FtpConnectionError("can't perform '#{methodName}' command when connection status is: #{connectionStatus}")
+            throw new FtpConnectionError("can't perform '#{name}' command when connection status is: #{connectionStatus}")
         .then () ->
           # now perform the requested command
           handler(args...)
