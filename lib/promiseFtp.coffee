@@ -57,6 +57,9 @@ otherPrototypeMethods = [
 class PromiseFtp
 
   constructor: () ->
+    if @ not instanceof PromiseFtp
+      throw new TypeError("PromiseFtp constructor called without 'new' keyword")
+    
     connectionStatus = STATUSES.NOT_YET_CONNECTED
     client = new FtpClient()
     connectOptions = null
