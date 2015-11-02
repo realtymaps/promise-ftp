@@ -17,7 +17,8 @@ Change Log
 * Version 1.2.0 changes:
   * the `FtpConnectionError` and `FtpReconectError` classes have been moved to
   [their own module](https://github.com/realtymaps/promise-ftp-errors), in anticipation of creating a
-  semi-interchangeable API for [promise-sftp](https://github.com/realtymaps/promise-sftp).
+  semi-interchangeable API for [promise-sftp](https://github.com/realtymaps/promise-sftp).  They are still exposed
+  on the main module, but for npm 3+ the `promise-ftp-errors` module must now be listed as an explicit dependency.
 
 * Version 1.1.0 adds:
   * the `autoReconnect` and `preserveCwd` options
@@ -165,10 +166,11 @@ message. Valid config properties:
     * preserveCwd <_boolean_>: Whether to attempt to return to the prior current working directory after a successful
     automatic reconnection.  Only used if `autoReconnect` is true.  **Default:** false
     
-* **reconnect**(): Connects to an FTP server using the config from the most recent call to **connect()**.
+* **reconnect**(): Connects to an FTP server using the config from the most recent call to **connect()**.  Returned
+promise resolves to the server's greeting message.
 
 * **end**(): Closes the connection to the server after any/all enqueued commands have been executed; returned promise
-resolves to a boolean indicating whether there was an error associated with closing the connection.
+resolves to any error associated with closing the connection, or _true_ if there was an error but it wasn't captured.
 
 * **destroy**(): Closes the connection to the server immediately.  Returns a boolean indicating whether the connection
 was connected prior to the call to **destroy()**.
@@ -192,7 +194,7 @@ enumerated in `PromiseFtp.`STATUSES, as well as below:
 
 ### Required "standard" commands (RFC 959)
 
-* **list**(\[path <_string_>, \]\[useCompression <_boolean_>\]): Retrieves the directory listing of `path`. `path`
+* **list**(\[path <_string_>\]\[, useCompression <_boolean_>\]): Retrieves the directory listing of `path`. `path`
 defaults to the current working directory. `useCompression` defaults to false.  Returned promise resolves to an array
 of objects with these properties:
 
@@ -221,28 +223,28 @@ of objects with these properties:
 
       * sticky <_boolean_>: True if the sticky bit is set for this entry **(*NIX only)**.
 
-* **get**(path <_string_>, \[useCompression <_boolean_>\]): Retrieves a file at `path` from the server.
+* **get**(path <_string_>\[, useCompression <_boolean_>\]): Retrieves a file at `path` from the server.
 `useCompression` defaults to false. Returned promise resolves to a `ReadableStream`.
 
-* **put**(input <_mixed_>, destPath <_string_>, \[useCompression <_boolean_>\]): Sends data to the server to be stored
+* **put**(input <_mixed_>, destPath <_string_>\[, useCompression <_boolean_>\]): Sends data to the server to be stored
 as `destPath`. `input` can be a ReadableStream, a Buffer, or a path to a local file. `useCompression` defaults to
-false. Returned promise resolves to undefined.
+false. Returned promise resolves to _undefined_.
 
-* **append**(input <_mixed_>, destPath <_string_>, \[useCompression <_boolean_>\]): Same as **put()**, except if
+* **append**(input <_mixed_>, destPath <_string_>\[, useCompression <_boolean_>\]): Same as **put()**, except if
 `destPath` already exists, it will be appended to instead of overwritten.
 
-* **rename**(oldPath <_string_>, newPath <_string_>): Renames `oldPath` to `newPath` on the server. Returned promise
-resolves to undefined.
+* **rename**(oldPath <_string_>, newPath <_string_>): Renames/moves `oldPath` to `newPath` on the server. Returned
+promise resolves to _undefined_.
 
-* **logout**(): Logs the user out from the server. Returned promise resolves to undefined.
+* **logout**(): Logs the user out from the server. Returned promise resolves to _undefined_.
 
-* **delete**(path <_string_>): Deletes a file, `path`, on the server. Returned promise resolves to undefined.
+* **delete**(path <_string_>): Deletes the file at `path`. Returned promise resolves to _undefined_.
 
 * **cwd**(path <_string_>): Changes the current working directory to `path`. Returned promise resolves to the new
-current directory, if the server replies with it in the response text; otherwise resolves to undefined.
+current directory, if the server replies with it in the response text; otherwise resolves to _undefined_.
 
 * **abort**(): Aborts the current data transfer (e.g. from **get()**, **put()**, or **list()**). Returned promise
-resolves to undefined.
+resolves to _undefined_.
 
 * **site**(command <_string_>): Sends `command` (e.g. 'CHMOD 755 foo', 'QUOTA') using SITE; returned promise resolves
 to an object with the following attributes:
@@ -254,27 +256,27 @@ to an object with the following attributes:
 * **status**(): Retrieves human-readable information about the server's status. Returned promise resolves to the status
 string sent by the server.
 
-* **ascii**(): Sets the transfer data type to ASCII. Returned promise resolves to undefined.
+* **ascii**(): Sets the transfer data type to ASCII. Returned promise resolves to _undefined_.
 
 * **binary**(): Sets the transfer data type to binary (default at time of connection). Returned promise resolves to
-undefined.
+_undefined_.
 
 ### Optional "standard" commands (RFC 959)
 
-* **mkdir**(path <_string_>, \[recursive <_boolean_>\]): Creates a new directory, `path`, on the server. `recursive` is
-for enabling a 'mkdir -p' algorithm and defaults to false. Returned promise resolves to undefined.
+* **mkdir**(path <_string_>\[, recursive <_boolean_>\]): Creates a new directory, `path`, on the server. `recursive` is
+for enabling a 'mkdir -p' algorithm and defaults to false. Returned promise resolves to _undefined_.
 
-* **rmdir**(path <_string_>, \[recursive <_boolean_>\]): Removes a directory, `path`, on the server. If `recursive`,
-this call will delete the contents of the directory if it is not empty. Returned promise resolves to undefined.
+* **rmdir**(path <_string_>\[, recursive <_boolean_>\]): Removes a directory, `path`, on the server. If `recursive`,
+this call will delete the contents of the directory if it is not empty. Returned promise resolves to _undefined_.
 
 * **cdup**(): Changes the working directory to the parent of the current directory. Returned promise resolves to
-undefined.
+_undefined_.
 
 * **pwd**(): Retrieves the current working directory. Returned promise resolves to the current working directory.
 
 * **system**(): Retrieves the server's operating system. Returned promise resolves to the OS string sent by the server.
 
-* **listSafe**(\[path <_string_>, \]\[useCompression <_boolean_>\]): Similar to **list()**, except the directory is
+* **listSafe**(\[path <_string_>\]\[, useCompression <_boolean_>\]): Similar to **list()**, except the directory is
 temporarily changed to `path` to retrieve the directory listing. This is useful for servers that do not handle
 characters like spaces and quotes in directory names well for the LIST command. This function is "optional" because it
 relies on **pwd()** being available.
@@ -286,5 +288,5 @@ relies on **pwd()** being available.
 * **lastMod**(path <_string_>): Retrieves the last modified date and time for `path`. Returned promise resolves an
 instance of `Date`.
 
-* **restart**(byteOffset <_integer_>): Sets the file byte offset for the next file transfer action (get/put) to
-`byteOffset`. Returned promise resolves to undefined.
+* **restart**(byteOffset <_integer_>): Sets the file byte offset for the next file transfer action initiated via
+**get()** or **put()** to `byteOffset`. Returned promise resolves to _undefined_.

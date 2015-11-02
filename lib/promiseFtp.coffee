@@ -14,7 +14,7 @@ STATUSES = require('promise-ftp-common').STATUSES
 
 # these methods need no custom logic; just wrap the common promise, connection-check, and reconnect logic around the
 # originals and pass through any args
-simpleReconnectPassthroughs = [
+simplePassthroughMethods = [
   'ascii'
   'binary'
   'abort'
@@ -37,7 +37,7 @@ simpleReconnectPassthroughs = [
 
 # these methods will have custom logic defined, and then will be wrapped in common promise, connection-check, and
 # reconnect logic
-complexReconnectPassthroughs = [
+complexPassthroughMethods = [
   'site'
   'cwd'
   'cdup'
@@ -161,13 +161,12 @@ class PromiseFtp
       connectionStatus
 
     
-    # methods listed in complexReconnectPassthroughs, which will get a common logic wrapper
+    # methods listed in complexPassthroughMethods, which will get a common logic wrapper
     
     @site = (command) ->
       promisifiedClientMethods.site(command)
       .spread (text, code) ->
-        text: text
-        code: code
+        { text, code }
 
     @cwd = (dir) ->
       promisifiedClientMethods.cwd(dir)
@@ -203,6 +202,8 @@ class PromiseFtp
                 .catch (err) =>
                   @destroy()
                   throw new FtpReconnectError(closeError, err, true)
+              else
+                intendedCwd = '.'
           # if we just started reconnecting or were already reconnecting, wait for that to finish before continuing
           if autoReconnectPromise
             return autoReconnectPromise
@@ -212,17 +213,17 @@ class PromiseFtp
           # now perform the requested command
           handler(args...)
 
-    # create the methods listed in simpleReconnectPassthroughs as common logic wrapped around the original client method
-    for name in simpleReconnectPassthroughs
+    # create the methods listed in simplePassthroughMethods as common logic wrapped around the original client method
+    for name in simplePassthroughMethods
       @[name] = commonLogicFactory(name)
 
-    # wrap the methods listed in complexReconnectPassthroughs with common logic
-    for name in complexReconnectPassthroughs
+    # wrap the methods listed in complexPassthroughMethods with common logic
+    for name in complexPassthroughMethods
       @[name] = commonLogicFactory(name, @[name])
 
   
   # set method names on the prototype; they'll be overwritten with real functions from inside the constructor's closure
-  for methodList in [simpleReconnectPassthroughs, complexReconnectPassthroughs, otherPrototypeMethods]
+  for methodList in [simplePassthroughMethods, complexPassthroughMethods, otherPrototypeMethods]
     for methodName in methodList
       PromiseFtp.prototype[methodName] = null
 
