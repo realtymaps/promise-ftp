@@ -8,9 +8,7 @@
     "Joe Ibershoff <joe@realtymaps.com>",
     "Moti Zilberman <motiz88@gmail.com>"
   ],
-  "directories": {
-    "dist": "./dist"
-  },
+  "files": ["dist"],
   "repository": {
     "type": "git",
     "url": "https://github.com/realtymaps/promise-ftp"
@@ -28,7 +26,7 @@
     "coffee-script": "1.x"
   },
   "peerDependencies": {
-    "@motiz88/promise-ftp-common": "^2.0.0"
+    "@motiz88/promise-ftp-common": "^2.0.1"
   },
   "license": "MIT",
   "bugs": {
