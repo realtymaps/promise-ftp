@@ -6,9 +6,9 @@
 FtpClient = require('ftp')
 path = require('path')
 
-FtpConnectionError = require('promise-ftp-common').FtpConnectionError
-FtpReconnectError = require('promise-ftp-common').FtpReconnectError
-STATUSES = require('promise-ftp-common').STATUSES
+FtpConnectionError = require('@motiz88/promise-ftp-common').FtpConnectionError
+FtpReconnectError = require('@motiz88/promise-ftp-common').FtpReconnectError
+STATUSES = require('@motiz88/promise-ftp-common').STATUSES
 
 
 # these methods need no custom logic; just wrap the common promise, connection-check, and reconnect logic around the
