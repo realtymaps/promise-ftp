@@ -190,10 +190,10 @@ class PromiseFtp
           reject(err)
         client.once('error', onError)
         client[name] args..., (err, res) ->
+          client.removeListener 'error', onError
           if err
             reject err
           else
-            client.removeListener 'error', onError
             resolve res
       if !handler
         handler = promisifiedClientMethods[name]
