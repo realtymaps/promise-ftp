@@ -185,10 +185,16 @@ class PromiseFtp
     
     # common promise, connection-check, and reconnect logic
     commonLogicFactory = (name, handler) ->
-      promisifiedClientMethods[name] = (args...) ->
-        new Promise (resolve, reject) ->
-          client[name] args..., (err, res) ->
-            if err then reject err else resolve(res)
+      promisifiedClientMethods[name] = (args...) -> new Promise (resolve, reject) ->
+        onError = (err) ->
+          reject(err)
+        client.once('error', onError)
+        client[name] args..., (err, res) ->
+          if err
+            reject err
+          else
+            client.removeListener 'error', onError
+            resolve res
       if !handler
         handler = promisifiedClientMethods[name]
       (args...) ->
