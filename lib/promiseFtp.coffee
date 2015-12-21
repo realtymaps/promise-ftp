@@ -187,7 +187,7 @@ class PromiseFtp
     commonLogicFactory = (name, handler) ->
       promisifiedClientMethods[name] = (args...) ->
         new Promise (resolve, reject) ->
-          client[name] (err, res) ->
+          client[name] args..., (err, res) ->
             if err then reject err else resolve(res)
       if !handler
         handler = promisifiedClientMethods[name]
