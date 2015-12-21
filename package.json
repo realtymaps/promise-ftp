@@ -8,9 +8,10 @@
     "Joe Ibershoff <joe@realtymaps.com>",
     "Moti Zilberman <motiz88@gmail.com>"
   ],
-  "directories": {
-    "dist": "./dist"
-  },
+  "files": [
+    "dist",
+    "index.js"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/realtymaps/promise-ftp"
