@@ -4,7 +4,6 @@
 
 
 FtpClient = require('ftp')
-Promise = require('bluebird')
 path = require('path')
 
 FtpConnectionError = require('promise-ftp-common').FtpConnectionError
