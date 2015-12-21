@@ -1,14 +1,16 @@
 {
   "name": "@motiz88/promise-ftp",
   "description": "a promise-based ftp client for node.js",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "index.js",
   "author": "RealtyMaps",
   "contributors": [
     "Joe Ibershoff <joe@realtymaps.com>",
     "Moti Zilberman <motiz88@gmail.com>"
   ],
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/realtymaps/promise-ftp"
