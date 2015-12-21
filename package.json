@@ -9,7 +9,8 @@
     "Moti Zilberman <motiz88@gmail.com>"
   ],
   "files": [
-    "dist"
+    "dist",
+    "index.js"
   ],
   "repository": {
     "type": "git",
@@ -28,7 +29,7 @@
     "coffee-script": "1.x"
   },
   "peerDependencies": {
-    "@motiz88/promise-ftp-common": "^2.0.1"
+    "@motiz88/promise-ftp-common": "^2.0.2"
   },
   "license": "MIT",
   "bugs": {
