@@ -1,7 +1,7 @@
 {
   "name": "@motiz88/promise-ftp",
   "description": "a promise-based ftp client for node.js",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "main": "index.js",
   "author": "RealtyMaps",
   "contributors": [
