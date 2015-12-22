@@ -5,11 +5,13 @@
   "main": "index.js",
   "author": "RealtyMaps",
   "contributors": [
-    "Joe Ibershoff <joe@realtymaps.com>"
+    "Joe Ibershoff <joe@realtymaps.com>",
+    "Moti Zilberman <motiz88@gmail.com>"
   ],
-  "directories": {
-    "lib": "./lib"
-  },
+  "files": [
+    "dist",
+    "index.js"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/realtymaps/promise-ftp"
@@ -21,9 +23,10 @@
     "node"
   ],
   "dependencies": {
-    "bluebird": "2.x",
-    "coffee-script": "1.x",
     "ftp": "0.3.10"
+  },
+  "devDependencies": {
+    "coffee-script": "1.x"
   },
   "peerDependencies": {
     "promise-ftp-common": "^1.1.2"
@@ -31,5 +34,13 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/realtymaps/promise-ftp/issues"
+  },
+  "engines": {
+    "node": ">=0.11.13",
+    "iojs": "*"
+  },
+  "scripts": {
+    "build": "coffee --compile --output dist/ lib/",
+    "dev": "coffee --watch --output dist lib/"
   }
 }

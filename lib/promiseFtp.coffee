@@ -4,7 +4,6 @@
 
 
 FtpClient = require('ftp')
-Promise = require('bluebird')
 path = require('path')
 
 FtpConnectionError = require('promise-ftp-common').FtpConnectionError
@@ -106,7 +105,7 @@ class PromiseFtp
       
     # methods listed in otherPrototypeMethods, which don't get a wrapper
     
-    @connect = (options) -> Promise.try () ->
+    @connect = (options) -> Promise.resolve().then () ->
       if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
         throw new FtpConnectionError("can't connect when connection status is: '#{connectionStatus}'")
       # copy options object so options can't change without another call to @connect()
@@ -126,7 +125,7 @@ class PromiseFtp
       # now that everything is set up, we can connect
       _connect(STATUSES.CONNECTING)
   
-    @reconnect = () -> Promise.try () ->
+    @reconnect = () -> Promise.resolve().then () ->
       if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
         throw new FtpConnectionError("can't reconnect when connection status is: '#{connectionStatus}'")
       _connect(STATUSES.RECONNECTING)
@@ -186,11 +185,14 @@ class PromiseFtp
     
     # common promise, connection-check, and reconnect logic
     commonLogicFactory = (name, handler) ->
-      promisifiedClientMethods[name] = Promise.promisify(client[name], client)
+      promisifiedClientMethods[name] = (args...) ->
+        new Promise (resolve, reject) ->
+          client[name] args..., (err, res) ->
+            if err then reject err else resolve(res)
       if !handler
         handler = promisifiedClientMethods[name]
       (args...) ->
-        Promise.try () =>
+        Promise.resolve().then () =>
           # if we need to reconnect and we're not already reconnecting, start reconnect
           if unexpectedClose && autoReconnect && !autoReconnectPromise
             autoReconnectPromise = _connect(STATUSES.RECONNECTING)
