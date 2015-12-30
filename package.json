@@ -1,7 +1,7 @@
 {
   "name": "promise-ftp",
   "description": "a promise-based ftp client for node.js",
-  "version": "1.2.9",
+  "version": "1.2.11",
   "main": "index.js",
   "author": "RealtyMaps",
   "contributors": [
@@ -9,7 +9,7 @@
     "Moti Zilberman <motiz88@gmail.com>"
   ],
   "files": [
-    "dist",
+    "lib",
     "index.js"
   ],
   "repository": {
@@ -29,7 +29,7 @@
     "coffee-script": "1.x"
   },
   "peerDependencies": {
-    "promise-ftp-common": "^1.1.2"
+    "promise-ftp-common": "^1.1.5"
   },
   "license": "MIT",
   "bugs": {
@@ -40,7 +40,7 @@
     "iojs": "*"
   },
   "scripts": {
-    "build": "coffee --compile --output dist/ lib/",
+    "prepublish": "coffee --compile --output dist/ lib/",
     "dev": "coffee --watch --output dist lib/"
   }
 }
