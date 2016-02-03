@@ -164,8 +164,9 @@ class PromiseFtp
     
     @site = (command) ->
       promisifiedClientMethods.site(command)
-      .spread (text, code) ->
-        { text, code }
+      .then (result) ->
+        text: result[0]
+        code: result[1]
 
     @cwd = (dir) ->
       promisifiedClientMethods.cwd(dir)
@@ -187,8 +188,13 @@ class PromiseFtp
     commonLogicFactory = (name, handler) ->
       promisifiedClientMethods[name] = (args...) ->
         new Promise (resolve, reject) ->
-          client[name] args..., (err, res) ->
-            if err then reject err else resolve(res)
+          client[name] args..., (err, res...) ->
+            if err
+              reject(err)
+            else if res.length == 1
+              resolve(res[0])
+            else
+              resolve(res)
       if !handler
         handler = promisifiedClientMethods[name]
       (args...) ->
