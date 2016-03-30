@@ -43,7 +43,7 @@ Install
 =======
 
     npm install promise-ftp
-    npm install promise-ftp-errors   # only necessary on npm 3+
+    npm install promise-ftp-common   # only necessary on npm 3+
 
 
 Examples
