@@ -61,6 +61,7 @@ class PromiseFtp
     
     connectionStatus = STATUSES.NOT_YET_CONNECTED
     client = new FtpClient()
+    @rawClient = client
     connectOptions = null
     autoReconnect = null
     preserveCwd = null
