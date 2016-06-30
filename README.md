@@ -14,6 +14,9 @@ CoffeeScript.  Promises in this module are provided by [Bluebird](https://github
 Change Log
 ============
 
+* Version 1.3.0 changes:
+  * addition of the **rawClient** property which exposes the underlying ftp client.
+
 * Version 1.2.0 changes:
   * the `FtpConnectionError` and `FtpReconectError` classes have been moved to
   [their own module](https://github.com/realtymaps/promise-ftp-errors), in anticipation of creating a
@@ -108,7 +111,8 @@ API
 
 For the most part, this module's API mirrors [node-ftp's API](https://github.com/mscdex/node-ftp#api), except that it
 returns promises which resolve or reject, rather than emitting events or calling callbacks.  However, there are some
-minor differences and some additional features. Besides, you can access the raw node-ftp client via **rawClient** property.
+minor differences and some additional features. If you need access to the underlying events or callback-based methods,
+you can access the raw node-ftp client via **rawClient** property.
 
 Errors
 ------
