@@ -108,7 +108,7 @@ API
 
 For the most part, this module's API mirrors [node-ftp's API](https://github.com/mscdex/node-ftp#api), except that it
 returns promises which resolve or reject, rather than emitting events or calling callbacks.  However, there are some
-minor differences and some additional features.
+minor differences and some additional features. Besides, you can access the raw node-ftp client via **rawClient** property.
 
 Errors
 ------
