@@ -270,8 +270,10 @@ _undefined_.
 * **mkdir**(path <_string_>\[, recursive <_boolean_>\]): Creates a new directory, `path`, on the server. `recursive` is
 for enabling a 'mkdir -p' algorithm and defaults to false. Returned promise resolves to _undefined_.
 
-* **rmdir**(path <_string_>\[, recursive <_boolean_>\]): Removes a directory, `path`, on the server. If `recursive`,
-this call will delete the contents of the directory if it is not empty. Returned promise resolves to _undefined_.
+* **rmdir**(path <_string_>\[, includeContents <_boolean_>\]): Removes a directory, `path`, on the server. If
+`includeContents` is true, this call will delete the contents of the directory if it is not empty; note that this
+currently only deletes files within the directory, not subdirectories (the command will fail if there are subdirectories
+present). Returned promise resolves to _undefined_.
 
 * **cdup**(): Changes the working directory to the parent of the current directory. Returned promise resolves to
 _undefined_.
