@@ -21,7 +21,7 @@ Change Log
   * the `FtpConnectionError` and `FtpReconectError` classes have been moved to
   [their own module](https://github.com/realtymaps/promise-ftp-errors), in anticipation of creating a
   semi-interchangeable API for [promise-sftp](https://github.com/realtymaps/promise-sftp).  They are still exposed
-  on the main module, but for npm 3+ the `promise-ftp-errors` module must now be listed as an explicit dependency.
+  on the main module as well.
 
 * Version 1.1.0 adds:
   * the `autoReconnect` and `preserveCwd` options
@@ -46,7 +46,6 @@ Install
 =======
 
     npm install promise-ftp
-    npm install promise-ftp-common   # only necessary on npm 3+
 
 
 Examples
