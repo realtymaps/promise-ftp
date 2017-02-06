@@ -8,7 +8,7 @@ This module is a wrapper around the [node-ftp](https://github.com/mscdex/node-ft
 features as well as a convenient promise-based API.
 
 This library is written primarily in CoffeeScript, but may be used just as easily in a Node app using Javascript or
-CoffeeScript.  Promises in this module are provided by [Bluebird](https://github.com/petkaantonov/bluebird).
+CoffeeScript.  [Native promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) are used in this module.
 
 
 Change Log
