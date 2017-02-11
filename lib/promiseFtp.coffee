@@ -4,6 +4,7 @@
 
 
 FtpClient = require('ftp')
+Promise = require('bluebird')
 path = require('path')
 
 FtpConnectionError = require('promise-ftp-common').FtpConnectionError
@@ -106,7 +107,7 @@ class PromiseFtp
       
     # methods listed in otherPrototypeMethods, which don't get a wrapper
     
-    @connect = (options) -> Promise.resolve().then () ->
+    @connect = (options) -> Promise.try () ->
       if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
         throw new FtpConnectionError("can't connect when connection status is: '#{connectionStatus}'")
       # copy options object so options can't change without another call to @connect()
@@ -126,7 +127,7 @@ class PromiseFtp
       # now that everything is set up, we can connect
       _connect(STATUSES.CONNECTING)
   
-    @reconnect = () -> Promise.resolve().then () ->
+    @reconnect = () -> Promise.try () ->
       if connectionStatus != STATUSES.NOT_YET_CONNECTED && connectionStatus != STATUSES.DISCONNECTED
         throw new FtpConnectionError("can't reconnect when connection status is: '#{connectionStatus}'")
       _connect(STATUSES.RECONNECTING)
@@ -187,19 +188,11 @@ class PromiseFtp
     
     # common promise, connection-check, and reconnect logic
     commonLogicFactory = (name, handler) ->
-      promisifiedClientMethods[name] = (args...) ->
-        new Promise (resolve, reject) ->
-          client[name] args..., (err, res...) ->
-            if err
-              reject(err)
-            else if res.length == 1
-              resolve(res[0])
-            else
-              resolve(res)
+      promisifiedClientMethods[name] = Promise.promisify(client[name], client)
       if !handler
         handler = promisifiedClientMethods[name]
       (args...) ->
-        Promise.resolve().then () =>
+        Promise.try () =>
           # if we need to reconnect and we're not already reconnecting, start reconnect
           if unexpectedClose && autoReconnect && !autoReconnectPromise
             autoReconnectPromise = _connect(STATUSES.RECONNECTING)

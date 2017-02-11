@@ -23,6 +23,7 @@
     "node"
   ],
   "dependencies": {
+    "bluebird": "2.x",
     "ftp": "0.3.10",
     "promise-ftp-common": "^1.1.5"
   },
