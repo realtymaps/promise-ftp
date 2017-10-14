@@ -24,7 +24,7 @@
     "node"
   ],
   "dependencies": {
-    "bluebird": "^3.5.0",
+    "bluebird": "2.x",
     "@icetee/ftp": "^0.3.15",
     "promise-ftp-common": "^1.1.5"
   },
