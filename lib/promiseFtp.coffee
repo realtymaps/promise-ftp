@@ -3,7 +3,7 @@
 'use strict'
 
 
-FtpClient = require('ftp')
+FtpClient = require('@icetee/ftp')
 Promise = require('bluebird')
 path = require('path')
 

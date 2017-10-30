@@ -6,7 +6,8 @@
   "author": "RealtyMaps",
   "contributors": [
     "Joe Ibershoff <joe@realtymaps.com>",
-    "Moti Zilberman <motiz88@gmail.com>"
+    "Moti Zilberman <motiz88@gmail.com>",
+    "Gabe Martin <gabema@gmail.com>"
   ],
   "files": [
     "dist",
@@ -24,7 +25,7 @@
   ],
   "dependencies": {
     "bluebird": "2.x",
-    "ftp": "0.3.10",
+    "@icetee/ftp": "^0.3.15",
     "promise-ftp-common": "^1.1.5"
   },
   "devDependencies": {
