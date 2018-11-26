@@ -239,7 +239,7 @@ false. Returned promise resolves to _undefined_.
 * **rename**(oldPath <_string_>, newPath <_string_>): Renames/moves `oldPath` to `newPath` on the server. Returned
 promise resolves to _undefined_.
 
-* **logout**(): Logs the user out from the server. Returned promise resolves to _undefined_.
+* **logout**(): Logs the user out from the server with QUIT command. Returned promise resolves to _undefined_.
 
 * **delete**(path <_string_>): Deletes the file at `path`. Returned promise resolves to _undefined_.
 
