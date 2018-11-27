@@ -139,7 +139,7 @@ class PromiseFtp
         if connectionStatus == STATUSES.NOT_YET_CONNECTED || connectionStatus == STATUSES.DISCONNECTED || connectionStatus == STATUSES.DISCONNECTING
           throw new FtpConnectionError("can't log out when connection status is: #{connectionStatus}")
         connectionStatus = STATUSES.LOGGING_OUT
-        promisifiedClientMethods.logout()
+        client.logout()
 
     @end = () -> new Promise (resolve, reject) ->
       if connectionStatus == STATUSES.NOT_YET_CONNECTED || connectionStatus == STATUSES.DISCONNECTED
