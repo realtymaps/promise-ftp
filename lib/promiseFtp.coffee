@@ -33,6 +33,7 @@ simplePassthroughMethods = [
   'size'
   'lastMod'
   'restart'
+  'logout'
 ]
 
 # these methods will have custom logic defined, and then will be wrapped in common promise, connection-check, and
@@ -47,7 +48,6 @@ complexPassthroughMethods = [
 otherPrototypeMethods = [
   'connect'
   'reconnect'
-  'logout'
   'end'
   'destroy'
   'getConnectionStatus'
